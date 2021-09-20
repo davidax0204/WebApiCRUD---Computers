@@ -19,13 +19,30 @@ namespace WebApiCRUD___Computers.Controllers.API
         }
 
         [HttpGet]
-        public IHttpActionResult GetComupters(string ModelName, int? RAM, int? ScreenSize)
+        public IHttpActionResult GetComupters(int? Id=null, string ModelName=null, string ManufacturerCompanyName=null,
+                                                string CPU=null, int? RAM=null, int? Memory=null, int? ScreenSize=null,
+                                                int? Price=null, int? MinPrice=null, int? MaxPrice=null)
         {
+            var searchModel = new ComputerSearchModel() 
+            { 
+                Id=Id,
+                ModelName = ModelName,
+                ManufacturerCompanyName = ManufacturerCompanyName,
+                CPU = CPU,
+                RAM = RAM,
+                Memory = Memory,
+                ScreenSize = ScreenSize,
+                Price = Price,
+                MaxPrice=MaxPrice,
+                MinPrice=MinPrice
+            };
 
-            return Ok();
+            var Computers = ComputerFilter(searchModel);
+
+            return Ok(Computers);
         }
 
-        private IQueryable<Computer> ComputerFilter(ComputerSearchModel searchModel)
+        private List<Computer> ComputerFilter(ComputerSearchModel searchModel)
         {
             var result = _context.Computers.AsQueryable();
 
@@ -37,14 +54,32 @@ namespace WebApiCRUD___Computers.Controllers.API
                 if (!string.IsNullOrEmpty(searchModel.ModelName))
                     result = result.Where(x => x.ModelName.Contains(searchModel.ModelName));
 
-                //if (searchModel.PriceFrom.HasValue)
-                //    result = result.Where(x => x.Price >= searchModel.PriceFrom);
+                if (!string.IsNullOrEmpty(searchModel.ManufacturerCompanyName))
+                    result = result.Where(x => x.ManufacturerCompanyName.Contains(searchModel.ManufacturerCompanyName));
 
-                //if (searchModel.PriceTo.HasValue)
-                //    result = result.Where(x => x.Price <= searchModel.PriceTo);
+                if (!string.IsNullOrEmpty(searchModel.CPU))
+                    result = result.Where(x => x.CPU.Contains(searchModel.CPU));
+
+                if (searchModel.RAM.HasValue)
+                    result = result.Where(x => x.RAM == searchModel.RAM);
+
+                if (searchModel.Memory.HasValue)
+                    result = result.Where(x => x.Memory == searchModel.Memory);
+
+                if (searchModel.ScreenSize.HasValue)
+                    result = result.Where(x => x.ScreenSize == searchModel.ScreenSize);
+
+                if (searchModel.Price.HasValue)
+                    result = result.Where(x => x.Price == searchModel.Price);
+
+                if (searchModel.MaxPrice.HasValue)
+                    result = result.Where(x => x.Price <= searchModel.MaxPrice);
+                
+                if (searchModel.MinPrice.HasValue)
+                    result = result.Where(x => x.Price >= searchModel.MinPrice);
 
             }
-            return result;
+            return result.ToList();
         }
 
         [HttpGet]
