@@ -19,11 +19,32 @@ namespace WebApiCRUD___Computers.Controllers.API
         }
 
         [HttpGet]
-        public IHttpActionResult GetComupters()
+        public IHttpActionResult GetComupters(string ModelName, int? RAM, int? ScreenSize)
         {
-            var computers = _context.Computers.ToList();
 
-            return Ok(computers);
+            return Ok();
+        }
+
+        private IQueryable<Computer> ComputerFilter(ComputerSearchModel searchModel)
+        {
+            var result = _context.Computers.AsQueryable();
+
+            if (searchModel != null)
+            {
+                if (searchModel.Id.HasValue)
+                    result = result.Where(x => x.Id == searchModel.Id);
+
+                if (!string.IsNullOrEmpty(searchModel.ModelName))
+                    result = result.Where(x => x.ModelName.Contains(searchModel.ModelName));
+
+                //if (searchModel.PriceFrom.HasValue)
+                //    result = result.Where(x => x.Price >= searchModel.PriceFrom);
+
+                //if (searchModel.PriceTo.HasValue)
+                //    result = result.Where(x => x.Price <= searchModel.PriceTo);
+
+            }
+            return result;
         }
 
         [HttpGet]
@@ -72,7 +93,6 @@ namespace WebApiCRUD___Computers.Controllers.API
             //Mapper.Map<Computer,Computer>(updatedComputer, computerInDb);
 
             _context.SaveChanges();
-
 
             return Ok();
         }
