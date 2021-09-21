@@ -21,7 +21,7 @@ namespace WebApiCRUD___Computers.Controllers.API
         [HttpGet]
         public IHttpActionResult GetComupters(int? Id=null, string ModelName=null, string ManufacturerCompanyName=null,
                                                 string CPU=null, int? RAM=null, int? Memory=null, int? ScreenSize=null,
-                                                int? Price=null, int? MinPrice=null, int? MaxPrice=null)
+                                                int? Price=null, int? MinPrice=null, int? MaxPrice=null, string sortBy=null)
         {
             var searchModel = new ComputerSearchModel() 
             { 
@@ -37,9 +37,10 @@ namespace WebApiCRUD___Computers.Controllers.API
                 MinPrice=MinPrice
             };
 
-            var Computers = ComputerFilter(searchModel);
+            var computers = ComputerFilter(searchModel);
+            computers = ComputerSort(computers.ToList(), sortBy);
 
-            return Ok(Computers);
+            return Ok(computers);
         }
 
         private List<Computer> ComputerFilter(ComputerSearchModel searchModel)
@@ -80,6 +81,35 @@ namespace WebApiCRUD___Computers.Controllers.API
 
             }
             return result.ToList();
+        }
+
+        private List<Computer> ComputerSort(List<Computer> computers, string sortBy=null)
+        {
+            if(string.IsNullOrEmpty(sortBy))
+            {
+                return computers;
+            }
+
+            switch (sortBy.ToLower())
+            {
+                case "price":
+                    computers = computers.OrderBy(computer => computer.Price).ToList();
+                    break;
+
+                case "ram":
+                    computers = computers.OrderBy(computer => computer.RAM).ToList();
+                    break;
+
+                case "memory":
+                    computers = computers.OrderBy(computer => computer.Memory).ToList();
+                    break;
+
+                case "screensize":
+                    computers = computers.OrderBy(computer => computer.ScreenSize).ToList();
+                    break;
+            }
+
+            return computers;
         }
 
         [HttpGet]

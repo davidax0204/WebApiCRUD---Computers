@@ -17,7 +17,7 @@ namespace WebApiCRUD___Computers.Models
         public int? Price { get; set; }
         public int? MinPrice { get; set; }
         public int? MaxPrice { get; set; }
-
+        public string SortBy { get; set; }
 
     }
 }
